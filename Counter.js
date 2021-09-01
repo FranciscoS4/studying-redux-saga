@@ -1,28 +1,41 @@
 /*eslint-disable no-unused-vars */
 import React, { Component, PropTypes } from 'react'
 
-const Counter = ({ value, onIncrement, onDecrement, onIncrementAsync }) =>
+import { createStore, applyMiddleware } from 'redux'
+import createSagaMiddleware from 'redux-saga'
+
+import reducer from './reducers'
+
+import rootSaga from './sagas';
+
+
+const sagaMiddleware = createSagaMiddleware();
+
+export const store = createStore(
+  reducer,
+  applyMiddleware(sagaMiddleware)
+);
+sagaMiddleware.run(rootSaga);
+
+const action = type => store.dispatch({type})
+
+const Counter = () =>
       <div>
-        <button onClick={onIncrementAsync}>
+        <button onClick={() => action('INCREMENT_ASYNC')}>
           Increment Async
         </button>
-        <button onClick={onIncrement}>
+        {' '}
+        <button onClick={() => action('INCREMENT')}>
           Increment
         </button>
         {' '}
-        <button onClick={onDecrement}>
+        <button onClick={() => action('DECREMENT')}>
           Decrement
         </button>
         <hr />
         <div>
-          Clicked: {value} times
+          Clicked: {store.getState()} times
         </div>
       </div>
-
-Counter.propTypes = {
-  value: PropTypes.number.isRequired,
-  onIncrement: PropTypes.func.isRequired,
-  onDecrement: PropTypes.func.isRequired
-}
 
 export default Counter
